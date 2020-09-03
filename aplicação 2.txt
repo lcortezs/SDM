@@ -1,0 +1,86 @@
+/* Sistemas Digitais Microprocessados
+ * Aplicação da Experiência 2
+ * Luiza Cortez da Silva Tapajoz de Arruda
+ */
+
+/*********************************************************************************
+* Ao girar o potenciometro se a tensão estiver entre 0V e 1,6V, pisca o LED D1   *              *
+* Ao girar o potenciometro se a tensão estiver entre 1,6V e 3,2V, pisca o LED D2 *                  *
+* Ao girar o potenciometro se a tensão estiver entre 3,2V e 5,0V, pisca o LED D3 *                                            *
+**********************************************************************************/
+
+#define F_CPU 16000000UL //define a frequencia do microcontrolador 16MHz (necessário para utilizar as rotinas de atraso)
+#include <avr/io.h> // definições do componente expecificado
+#include <util/delay.h>
+
+#define LED1 PB5 
+#define LED2 PB4 
+#define LED3 PB3 
+
+#define set_bit(Y, bit_x) (Y|= (1<<bit_x)) // ativa o bit x da variavel y
+#define cpl_bit(Y, bit_x) (Y^= (1<<bit_x)) // troca o estado do bit x da variavel y
+#define clr_bit(Y, bit_x) (Y&=~ (1<<bit_x)) // limpa o bit x da variavel y
+#define tst_bit(Y, bit_x) (Y& (1<<bit_x)) // testa o bit x da variavel y
+
+void Adc_rotina(void)
+{
+	unsigned short int value, value_high;
+	//Inicia conversão ADC
+	set_bit(ADCSRA,ADSC); //inicia a conversão
+	while (tst_bit(ADCSRA,ADSC)==1)
+	
+	//leitura por bytes
+	value = (unsigned short int)(ADCL); // 8 bits
+	value_high = (unsigned short int)(ADCH<<8);
+	value |= value_high;
+	
+
+	if((value>=0)&&(value<=327)) //de 0V ate 1,6V
+	{
+		cpl_bit(PORTB,LED1);
+		 _delay_ms(1000); //atraso de 1s
+		set_bit(PORTB,LED2); 
+		set_bit(PORTB,LED3);
+ 	
+	}
+	if((value>=327)&&(value<=655)) //de 1,6v até 3,2v
+	{
+		cpl_bit(PORTB,LED2);
+		 _delay_ms(1000); //atraso de 1s
+		set_bit(PORTB,LED1); 
+		set_bit(PORTB,LED3);
+	}
+	if((value>=655)&&(value<=1024)) //de 3,2v ate 5v
+	{
+		cpl_bit(PORTB,LED3);
+		 _delay_ms(1000); //atraso de 1s		
+		set_bit(PORTB,LED1); 
+		set_bit(PORTB,LED2);
+	}
+				
+}
+
+int main(void)
+{
+	DDRB=0xFF; //configura os pinos do PORTB como saídas
+	
+	
+	//Apaga todos os LEDS
+	set_bit(PORTB,LED1);
+	set_bit(PORTB,LED2);
+	set_bit(PORTB,LED3);
+	
+	//Configuração do ADC
+
+	//DIDR0 => ADC5D = 1 entrada analogica PC5 (potenciometro externo)
+	DIDR0 = 0x20; 
+	//ADMUX => Tensão AVCC, canal ADC5, resultado alinhado a direita
+	ADMUX = 0x45;
+	//ADCSRA => ADC habilitado, prescaler = 128
+	ADCSRA = 0x87; 
+	
+	while(1)
+	{
+		Adc_rotina()
+	}
+}

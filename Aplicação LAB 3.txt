@@ -1,0 +1,94 @@
+/*
+Luiza C S T Arruda
+Aplicação da Experiência 3
+
+Elaborar um programa com três chaves:
+S2, S2 e S3 como interrupções de mudança de pino
+
+1 - S1 ativada, rotina de interrupção deve piscar os leds a cada 300ms;
+2 - S2 ativada, piscar LEDs D1 e D3 a cada 500ms, e os outros apagados;
+3 - S3 ativada, D2 e D4 a cada 200ms, e os demais acesos.
+*/
+
+//Configuração
+#define F_CPU 16000000UL 
+#include <avr/io.h>
+#include <avr/interrupt.h> //incluir biblioteca de interrupção
+#include <util/delay.h>
+#define set_bit(REG, BIT) (REG |= (1<<BIT))
+#define clr_bit(REG, BIT) (REG &= ~(1<<BIT))
+#define test_bit(REG, BIT) (REG & (1<<BIT))
+#define cpl_bit(Y, bit_x) (Y^= (1<<bit_x)) // troca o estado do bit x da variavel y
+unsigned int rotina=0;
+ISR(PCINT1_vect); 
+
+//Entradas
+#define S1 PC1
+#define S2 PC2
+#define S3 PC3
+
+//Saidas
+#define LED1 PD1
+#define LED2 PD2
+#define LED3 PD3
+#define LED4 PD4
+
+int main(void){
+	DDRC = 0b00000000; // Seleciona os botões como entrada
+	PORTC = 0b00001110; // Habilita pull-up nos botões.
+	PORTD=0xFF;
+	DDRD = 0b00011110; // Seleciona os LEDs como saída.
+	UCSR0B = 0x00; //desabilita o Rx e o Tx para trabalhar com os pinos do arduino
+
+//Habilitando as interrupções
+	PCICR = 1<<PCIE1;
+	PCMSK1 = (1<<PCINT3)|(1<<PCINT2)|(1<<PCINT3);/*habilita os pinos PCINT8:10 para
+	gerar interrupção*/
+	
+	EIMSK = 0b00001110; // Ativa as interrupções
+	sei(); // Liga a chave geral de interrupções.
+	
+	while(1)
+	{
+		if(rotina==1)
+		{
+			PORTD=0b1111111;
+			_delay_ms(300);
+			PORTD=0b0000000;
+			_delay_ms(300);
+		}
+		if(rotina==2)
+		{
+			PORTD=0b1111111;
+			_delay_ms(500);
+			PORTD=0b1110101;
+			_delay_ms(500);
+		}
+		if(rotina==3)
+		{
+			PORTD=0b1111111;
+			_delay_ms(200);
+			PORTD=0b1101011;
+			_delay_ms(200);
+		}
+	}
+}
+
+//Interrupção
+
+ISR(PCINT1_vect)
+{
+	if(!test_bit(PINC, S1))
+	{
+		rotina=1;
+	}
+	if(!test_bit(PINC, S2))
+	{
+		rotina=2;
+	}
+	if(!test_bit(PINC, S3))
+	{
+		rotina=3;
+	}
+
+}

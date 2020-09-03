@@ -1,0 +1,99 @@
+P1 de SDM
+O que vai cair? Lágrimas dor e sofrimento
+- Entradas e Saídas Digitais	
+	- Nosso microcontrolador possui 3 conjuntos de pinos I/OS:
+		- PORTB, PORTC, PORTD. 
+	- PORTx: Regidtrador de dados;
+	- DDRx: Registrador de direção, usado para definir se os pinos são entradas ou saídas;
+		- 1 = saída 
+		- 0 = entrada (quando for escrito 1 no registrador PORTx habilitará o pull-up interno e a leitura do estado lógico do pino
+	- PINx: Registrador de entrada, usado para ler o conteúdo do pinos;
+
+- ADC (Analogic Digital Conversor)
+	- Nosso microcontrolador possui 6 canais multiplexados;
+	- Existe um conversor A/D de aproximação sucessivas de 10 bits de resolução;
+		- Como só existe um conversor A/D, só é possível selecionar 1 canal por vez para conversão
+			- Isso é feito através da config. dos registradores internos.
+	- A conversão gera um resultado de 10 bits, sendo assim necessita de 2 registradores ADCH e ADCL
+	- Registradores de configuração do conversor A/D
+		- DIDR0 - Digital Input disable Register 0; (p. 448) 
+			- Desativa entradas digitais, somente nos bits que forem ser utilizados
+		- ADMUX - ADC Multiplexer selection Register; (p. 444)
+			- 0000 0000 -> ultimos 4 bits, para selecionar a porta que será usada
+			- quinto bit nao eh nada
+			- sexto -> alinhado direita (0) ou esquerda (1)
+			- Ultimos dois bits para decidir o que ele será (por ex. AVCC)			
+		- ADCSRA - ADC Control and Status Register A; (p. 445)
+			- BITS 0,1,2 determinam o clock, sempre será 128, logo, 111
+			- bit 7 sempre 1, bit que a gente liga
+			- bit 5 e 6 em 1 > conversão continua
+			- bit 5 e 6 em 0 > conversão simples
+		- ADCSRB - ADC Control and Status Register B; (p. 447)
+			- o bit 5  do ADCSRA seleciona o modo de operação dos bits 0 até 2, se o ADATE (bit 5 do ADCSRA) estiver em 1, ele selecionará q ocorra algo do ADCSRB
+			- no caso para conversão continua, os bits 0 até 2 serão 000
+	- Dois modos de operação: conversão simples e conversão contínua
+		- Conversão simples
+			- Necessário a inicialização de cada conversão
+			- Assim que finalizada a conversão, os registradores de dados são preenchidos e o bit ADIF é colocado em 1
+			- Para iniciar a conversão é necessário ligar o bit ADSC. Permanece em 1 quando a conversão está em processo
+		- Conversão contínua
+			- Inicia a primeira conversão e o conversor iniciará automaticamente as próximas conversões
+	- Bloco Prescaler 
+			- O prescaler com 128, provendo um clock de 125kHz para o ADC, considerando frequência de 16MHz, a taxa de amostragem será: 125kHz / 13 = 9600 amostras por segundo.
+		
+	- O conversor A/D possui 10 bits de resolução, os valores 0 e Vref serão convertidos entre 0 e 1023:
+		ADC = (Vin*1023)/Vref
+- INTERRUPÇÃO
+	- As interrupções são vetoradas, possuem endereços (p. 158)
+	- As interrupção podem ser habilitadas ou desabilitadas individualmente, a isso chamamos de mascaráveis;
+	- Há um bit I no registrador SREG que pode habilitar ou desabilitar TODAS AS INTERRUPÇÕES
+		- sei() > ativa
+		- cli() > desativa
+	- Modo de funcionamento de uma interrupção
+		a) ocorre uma interrupção
+		b) a CPU completa a instrução em andamento
+		c) Carrega na pilha o endereço da prox instrução que seria execeutada
+		d) desvia para a posição de memória correspondente à interrupção;
+		e) o código escrito no endereço da interrupção é executado até encontrar um RETI;
+		f) o PC recebe o valor armazenado na pilha;
+		g) o programa roda a partir do ponto que parou antes da interrupção.
+	- Ao atender uma interrupção, o mic desabilita todas as outras interrupções através do bit I (zerando) do SREG;
+	- Ao retornar da interrupção (RETI) o bit I é colocado em 1 no SREG;
+	- Mic irá tratar as interrupções pela ordem de prioridade
+	- Antes de atender as interrupção o AVR irá executar as instruções do programa principal
+	- Existem alguns tipos de interrupção:
+		- 1 tipo) o bit de sinalização é ativado indicando que a interrupção ocorreu e é mantido até que a interrupção seja atendida, sendo zerado depois
+			Várias interupções podem ficar ativas enquanto uma está sendo atendida, e permite que sejam processadas por ordem de prioridade
+		- 2 tipo) Não existe bit de sinalização e a interrupção é disparada quando o evento que a gera está presente, é o caso de interrupção externa por nível
+			A interrupção só é atendida se sua condição existir quando a chave geral estiver ativa.
+	- PORTD bit 2 e 3: interrupções 0 e 1 :) (INT0 e INT1)
+	- Interrupção externa
+		Todos os pinos I/O podem gerar interrupções externas por mudança de estado lógico
+- PWM 
+	- Registradores a serem programados:
+		- TCCR0A: controla comportamento do pino OC0A e OC0B e modo de operação
+		- TCCR0B: controla forma de onda (WGM02) e clock/prescaler
+		- OCR0A: ciclo ativo do PWM da saida OC0A
+		- OCR0B: ciclo ativo do PWM da saida OC0B
+--------------------------------------------------------------------------------------
+		- TCCR1A: controla comportamento do pino OC1A e OC1B e modo de operação
+		- TCCR1B: controla forma de onda (WGM12) e clock/prescaler
+ 		- OCR1A: ciclo ativo do PWM da saida OC1A
+		- OCR1B: ciclo ativo do PWM da saida OC1B
+-----------------------------------------------------------------------------------------
+		- TCCR2A: controla comportamento do pino OC2A e OC2B e modo de operação
+		- TCCR2B: controla forma de onda (WGM22) e clock/prescaler
+		- OCR2A: ciclo ativo do PWM da saida OC2A
+		- OCR2B: ciclo ativo do PWM da saida OC2B
+	- Modo PWM com fase corrigida:
+		- Temporizador/Contador 0
+			f_pwm=(f_osc)/2Prescaler(1+TOP), onde Prescaler = 1, 8, 64, 256 ou 1024
+		- Temporizador/Contador 1
+			f_pwm=(f_osc)/2Prescaler(1+TOP), onde Prescaler = 1, 8, 64, 256 ou 1024
+		- Temporizador/Contador 2
+			f_pwm=(f_osc)/2Prescaler(1+TOP), onde Prescaler = 1, 8, 32, 64, 128, 256 ou 1024
+
+
+
+
+

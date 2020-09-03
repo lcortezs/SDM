@@ -1,0 +1,59 @@
+/* Sistemas Digitais Microprocessados
+ * Aplicação da Experiência 1
+ * Luiza Cortez da Silva Tapajoz de Arruda
+ */
+
+/*********************************************************************
+* Se S1 está ativa, liga LED D1 e após 1s, led D2;                   *
+* Se S2 está ativa, liga LED D3 e após 1s, LED D4;                   *
+* Se S1 e S2 estiverem inativas, nenhum led deve ser acesso.         *                                               *
+**********************************************************************/
+
+#define F_CPU 16000000UL //define a frequencia do microcontrolador 16MHz (necessário para utilizar as rotinas de atraso)
+#include <avr/io.h> // definições do componente expecificado
+#include <util/delay.h> //biblioteca para as rotinas de _delay_ms() e delay_us()
+
+#define set_bit(Y, bit_x) (Y|= (1<<bit_x)) // ativa o bit x da variavel y
+#define clr_bit(Y, bit_x) (Y&=~ (1<<bit_x)) // limpa o bit x da variavel y
+#define cpl_bit(Y, bit_x) (Y^= (1<<bit_x)) // troca o estado do bit x da variavel y
+#define tst_bit(Y, bit_x) (Y& (1<<bit_x)) // testa o bit x da variavel y
+#define MOTOR1 PB5 // = LED D1 
+#define MOTOR2 PB4 // = LED D2 
+#define MOTOR3 PB3 // = LED D3 
+#define MOTOR4 PB2// = LED D4 
+#define S1 PC1 // S1 É O BOTÃO 1
+#define S2 PC2 // S2 É O BOTÃO 2
+
+
+int main()
+{ 
+	DDRB = 0b00111100; // configura o PORTB, PB3 (arduino 11) saída, os outros pinos entradas
+	DDRC = 0b00000000; // configura o PORTC, PC2 (arduino A2) todos pinos são saidas
+	PORTC = 0b00000110; // habitlita o pull-up para o botão PC2
+	
+	//INICIALIZAÇÃO
+	
+	PORTB = 0xff;
+	 
+	while(1) // laço infinito
+		{
+			while(!tst_bit(PINC,S1))//se o botão S1 for pressionado executa o if
+			{
+				cpl_bit(PORTB,MOTOR1);
+				_delay_ms(1000); //atraso de 1s
+				cpl_bit(PORTB,MOTOR2);
+			}
+			
+			while(!tst_bit(PINC,S2))//se o botão S2 for pressionado executa o if
+			{
+				cpl_bit(PORTB,MOTOR3);
+				_delay_ms(1000); //atraso de 1s
+				cpl_bit(PORTB,MOTOR4);
+			}
+
+			set_bit(PORTB,MOTOR1);
+			set_bit(PORTB,MOTOR2);
+			set_bit(PORTB,MOTOR3);
+			set_bit(PORTB,MOTOR4); //apaga os leds (desliga os motores)
+		}
+}
