@@ -1,9 +1,9 @@
 #include <avr/io.h>         //biblioteca para acesso aos registradores do uC
-#include "util/delay.h"        //biblioteca para funções de delay
+#include "util/delay.h"        //biblioteca para funÃ§Ãµes de delay
 
-int main(void)             //função principal
+int main(void)             //funÃ§Ã£o principal
 {
-	DDRB = 0b00100000;     //configura pino PB5 como saída e demais como entradas
+	DDRB = 0b00100000;     //configura pino PB5 como saÃ­da e demais como entradas
 	
 	while(1)             //loop principal
 	{
