@@ -14,6 +14,8 @@ d. Caso a umidade seja maior que z valor, aciona-se o led PB1 de alerta e o buzz
 mas caso a gente não use assim, pode ser um led que indique que está sendo medido. 
 e. Botão PD3 é o botão de emergência. Ele cria uma interrupção externa e caso ele seja acionado o motor irá parar, o led de alerta irá acender e o buzzer irá tocar.
 
+Link pro overleaf: https://www.overleaf.com/2389755347wgsncfpfrcpj
+
 */
 
 #define F_CPU 16000000UL //Definição da frequência do Microcontrolador
