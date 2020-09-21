@@ -34,7 +34,8 @@ ISR(TIMER1_OVF_vect); // Protótipo da Interrupção TIMER1. (16 bits)
 #define indicador PB4
 #define sensor_umidade PC0 
 #define botao_inicia PD2  
-#define botao_emergencia PD3 
+#define botao_emergencia PD3
+#define botao_desliga PD4
 
 //Variáveis
 char processo = 0; // variavel do processo
@@ -86,6 +87,9 @@ while(1) //laço infinito
         
         if(!tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado, inicia o processo
         processo = 1; 
+        
+        if(!tst_bit(PIND, botao_desliga)==0) //se o botão for pressionado:
+        processo = 0; 
        
        _delay_ms(500); 
         
@@ -110,8 +114,7 @@ while(1) //laço infinito
                   set_bit(PORTB,buzzer); 
            }
         
-                if(!tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado:
-                processo = 0; 
+                
            }
         
   
