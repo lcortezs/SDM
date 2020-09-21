@@ -89,14 +89,14 @@ while(1) //laço infinito
        
        _delay_ms(500); 
         
-        if(processo==1)
+        while(processo==1)
         {
             set_bit(PORTB,indicador); //LED para indicar inicio do processo
             
            if(ADC>511)//Umidade menor do que 50%, ou seja, maior que [(2,5*1023)/5]=511
            { 
                  OCR0B = 256; //duty cycle = 100%, motor ligado  
-                 clr_bit(PORTB,PB3); //liga o buzzer
+                 set_bit(PORTB,PB3); //liga o buzzer
                  flag_tempo=1; //vai para a rotina timer
                  segundo=15; //conta 15 segundos
                  flag_tempo=0; //Para de contar
@@ -106,8 +106,8 @@ while(1) //laço infinito
            {
                   OCR0B = 0; //desliga motor
                   PORTB = 0x00; // desliga tudo
-                  clr_bit(PORTB,alerta);
-                  clr_bit(PORTB,buzzer); 
+                  set_bit(PORTB,alerta);
+                  set_bit(PORTB,buzzer); 
            }
         
                 if(!tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado:
