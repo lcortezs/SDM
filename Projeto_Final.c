@@ -81,17 +81,17 @@ sei(); // Liga a chave geral de interrupções.
   
 while(1) //laço infinito
 {
-        PORTB=0xFF; //Mantendo as saídas desligadas
+        PORTB=0x00; //Mantendo as saídas desligadas
         OCR0B = 0; // Mantendo o motor desligado
         
-        if(tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado, inicia o processo
+        if(!tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado, inicia o processo
         processo = 1; 
        
        _delay_ms(500); 
         
-        while(processo==1);
+        if(processo==1)
         {
-            clr_bit(PORTB,indicador); //LED para indicar inicio do processo
+            set_bit(PORTB,indicador); //LED para indicar inicio do processo
             
            if(ADC>511)//Umidade menor do que 50%, ou seja, maior que [(2,5*1023)/5]=511
            { 
@@ -110,7 +110,7 @@ while(1) //laço infinito
                   clr_bit(PORTB,buzzer); 
            }
         
-                if(tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado:
+                if(!tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado:
                 processo = 0; 
            }
         
