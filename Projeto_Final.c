@@ -21,6 +21,7 @@ ser acionado o motor irá parar, o LED de alerta irá acender, o LED PB4 irá
 apagar e o buzzer irá tocar.
 
 */
+
 #define F_CPU 16000000UL //Definição da frequência do Microcontrolador
 #include <avr/io.h> //Definições do componente especificado
 #include <avr/interrupt.h> //Incluindo biblioteca de interrupção
@@ -46,7 +47,7 @@ ISR(TIMER1_OVF_vect); // Protótipo da Interrupção TIMER1. (16 bits)
 //Variáveis
 char processo = 0; // variavel do processo
 char flag_tempo = 0; // permite contar tempo
-char segundo = 0;
+char segundo = 0; 
 char status = 0; // estado das saidas da maquina
 char status_motor = 0; // estado do motor (duty cycle)
 char tempo=0;
@@ -90,7 +91,7 @@ while(1) //laço infinito
 	if(tst_bit(PIND, botao_inicia)==0) //se o botão for pressionado, inicia o processo
 	processo = 1;
 
-	if(tst_bit(PIND, botao_desliga)==0) //se o botão for pressionado o processo para
+	if(tst_bit(PIND, botao_desliga)==0) //se o botão for pressionado o processo encerra o processo
 	processo = 0;
 
 	_delay_ms(500);
