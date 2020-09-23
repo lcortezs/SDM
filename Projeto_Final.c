@@ -5,7 +5,7 @@ Alunos: Luiza Cortez da Silva Tapajoz de Arruda
 
  Sensor de Umidade de Solo
 
-- PD2, o botão de iniciar, inicia o processo;
+- PD2, o botão de iniciar, inicia o processo. Já o botão PD4, é utilizado para desligar, ou seja, encerrar o processo;
 - O LED PB4 irá indicar o funcionamento, ficará ligado durante o processo;
 - O sensor A0, conectado em PC0, mede a umidade do solo, esse valor é convertido.
 O sensor funciona como um potenciômetro, ou seja, o valor de 0 à 5V corresponde
@@ -55,8 +55,8 @@ int main(void)
 {
 //Configuração de entradas e saídas digitais
 DDRB = 0x1A; // pinos PB1, PB3 e PB4: saidas
-DDRD = 0x20; // pino PD2 e PD3: entradas e PD5: saida
-PORTD = 0x0C; // pull up: PD3 e PD2
+DDRD = 0x20; // pino PD2, PD3 e PD4: entradas e PD5: saida
+PORTD = 0x1C; // pull up: PD4, PD3 e PD2
 
 //Configuração do ADC
 DIDR0 = 0x01;// entrada analógica no PC0
